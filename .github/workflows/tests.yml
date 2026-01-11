@@ -2,30 +2,41 @@ name: Tests
 
 on:
   push:
-    branches: [main, master]
-  pull_request:
-    branches: [main, master]
+    branches:
+      - ""
+    tags:
+      - ""
 
 jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: 14.x
 
-      - name: Get correct testing library (Project 2)
+      - name: Check if the repository is private
+        if: ${{ github.event.repository.private }}
+        run: exit 1
+
+      - name: Get testing lib
         run: |
           set -eu
-          git clone --branch main --single-branch --depth 1 \
-            https://github.com/Yandex-Practicum/tests-selfmade-project-2-public.git
+          git clone --branch main --single-branch --depth 1 https://github.com/Yandex-Practicum/tests-selfmade-project-2-public.git
 
+      # Не роняем job мгновенно, чтобы успеть вывести отчёт и загрузить картинку
       - name: Run the tests
+        id: run_tests
+        continue-on-error: true
         run: bash tests-selfmade-project-2-public/run.sh
+
+      - name: Show test results
+        if: always()
+        run: bash tests-selfmade-project-2-public/result.sh
 
       - name: Upload layout-compare
         if: always()
@@ -35,6 +46,7 @@ jobs:
           path: tests-selfmade-project-2-public/output.jpg
           if-no-files-found: ignore
 
-      - name: Show test results
-        if: always()
-        run: bash tests-selfmade-project-2-public/result.sh
+      # В конце честно красим workflow, если тесты реально упали
+      - name: Fail if tests failed
+        if: steps.run_tests.outcome != 'success'
+        run: exit 1
