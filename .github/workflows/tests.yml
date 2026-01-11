@@ -2,10 +2,9 @@ name: Tests
 
 on:
   push:
-    branches:
-      - ""
-    tags:
-      - ""
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
 
 jobs:
   tests:
@@ -17,7 +16,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 14.x
+          node-version: 20.x  # Обновлено с 14.x (устарел)
 
       - name: Check if the repository is private
         if: ${{ github.event.repository.private }}
@@ -46,6 +45,7 @@ jobs:
           path: tests-selfmade-project-2-public/output.jpg
           if-no-files-found: ignore
 
+      # В конце честно красим workflow, если тесты реально упали
       - name: Fail if tests failed
         if: steps.run_tests.outcome != 'success'
         run: exit 1
