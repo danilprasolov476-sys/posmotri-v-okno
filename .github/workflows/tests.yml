@@ -46,7 +46,6 @@ jobs:
           path: tests-selfmade-project-2-public/output.jpg
           if-no-files-found: ignore
 
-      # В конце честно красим workflow, если тесты реально упали
       - name: Fail if tests failed
         if: steps.run_tests.outcome != 'success'
         run: exit 1
