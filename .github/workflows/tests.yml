@@ -18,11 +18,7 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: Check if repository is private
-        if: github.event.repository.private
-        run: exit 1
-
-      - name: Get testing library
+      - name: Get correct testing library (Project 2)
         run: |
           set -eu
           git clone --branch main --single-branch --depth 1 \
