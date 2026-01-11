@@ -2,35 +2,35 @@ name: Tests
 
 on:
   push:
-    branches:
-      - ""
-    tags:
-      - ""
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
 
 jobs:
   tests:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Use Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20.x'
 
-      - name: Check if the repository is private
-        if: ${{ github.event.repository.private }}
+      - name: Check if repository is private
+        if: github.event.repository.private
         run: exit 1
 
-      - name: Get testing lib
-        run: set -eu && git clone --branch main --single-branch --depth 1 https://github.com/Yandex-Practicum/tests-selfmade-project-2-public.git
+      - name: Get testing library
+        run: |
+          set -eu
+          git clone --branch main --single-branch --depth 1 \
+            https://github.com/Yandex-Practicum/tests-selfmade-project-2-public.git
 
       - name: Run the tests
         run: bash tests-selfmade-project-2-public/run.sh
 
-      # Артефакт полезен даже когда тесты упали
       - name: Upload layout-compare
         if: always()
         uses: actions/upload-artifact@v4
